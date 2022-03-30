@@ -43,7 +43,7 @@ type (
 		// nolint
 		metricType       MetricType    // metric type
 		MetricName       MetricName    // metric name
-		metricRollupName MetricName    // optional. if non-empty, this name must be used for rolled-up version of this metric
+		MetricRollupName MetricName    // optional. if non-empty, this name must be used for rolled-up version of this metric
 		buckets          tally.Buckets // buckets if we are emitting histograms
 		unit             MetricUnit
 	}
@@ -2660,7 +2660,7 @@ func NewTimerDef(name string) MetricDefinition {
 }
 
 func NewRollupTimerDef(name string, rollupName string) MetricDefinition {
-	return MetricDefinition{MetricName: MetricName(name), metricRollupName: MetricName(rollupName), metricType: Timer, unit: Milliseconds}
+	return MetricDefinition{MetricName: MetricName(name), MetricRollupName: MetricName(rollupName), metricType: Timer, unit: Milliseconds}
 }
 
 func NewBytesHistogramDef(name string) MetricDefinition {
@@ -2677,7 +2677,7 @@ func NewCounterDef(name string) MetricDefinition {
 
 // Rollup counter name is used to report aggregated metric excluding namespace tag.
 func NewRollupCounterDef(name string, rollupName string) MetricDefinition {
-	return MetricDefinition{MetricName: MetricName(name), metricRollupName: MetricName(rollupName), metricType: Counter}
+	return MetricDefinition{MetricName: MetricName(name), MetricRollupName: MetricName(rollupName), metricType: Counter}
 }
 
 func NewGaugeDef(name string) MetricDefinition {

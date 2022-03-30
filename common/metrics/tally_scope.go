@@ -64,8 +64,8 @@ func (m *tallyScope) IncCounter(id int) {
 func (m *tallyScope) AddCounter(id int, delta int64) {
 	def := m.defs[id]
 	m.scope.Counter(def.MetricName.String()).Inc(delta)
-	if !def.metricRollupName.Empty() {
-		m.rootScope.AddCounterInternal(def.metricRollupName.String(), delta)
+	if !def.MetricRollupName.Empty() {
+		m.rootScope.AddCounterInternal(def.MetricRollupName.String(), delta)
 	}
 }
 
@@ -76,8 +76,8 @@ func (m *tallyScope) AddCounterInternal(name string, delta int64) {
 func (m *tallyScope) UpdateGauge(id int, value float64) {
 	def := m.defs[id]
 	m.scope.Gauge(def.MetricName.String()).Update(value)
-	if !def.metricRollupName.Empty() {
-		m.scope.Gauge(def.metricRollupName.String()).Update(value)
+	if !def.MetricRollupName.Empty() {
+		m.scope.Gauge(def.MetricRollupName.String()).Update(value)
 	}
 }
 
@@ -85,8 +85,8 @@ func (m *tallyScope) StartTimer(id int) Stopwatch {
 	def := m.defs[id]
 	timer := NewStopwatch(m.scope.Timer(def.MetricName.String()))
 	switch {
-	case !def.metricRollupName.Empty():
-		return NewCompositeStopwatch(timer, m.rootScope.StartTimerInternal(def.metricRollupName.String()))
+	case !def.MetricRollupName.Empty():
+		return NewCompositeStopwatch(timer, m.rootScope.StartTimerInternal(def.MetricRollupName.String()))
 	case m.isNamespaceTagged:
 		timerAll := m.rootScope.StartTimerInternal(def.MetricName.String() + totalMetricSuffix)
 		return NewCompositeStopwatch(timer, timerAll)
@@ -103,8 +103,8 @@ func (m *tallyScope) RecordTimer(id int, d time.Duration) {
 	def := m.defs[id]
 	m.scope.Timer(def.MetricName.String()).Record(d)
 	switch {
-	case !def.metricRollupName.Empty():
-		m.rootScope.RecordTimerInternal(def.metricRollupName.String(), d)
+	case !def.MetricRollupName.Empty():
+		m.rootScope.RecordTimerInternal(def.MetricRollupName.String(), d)
 	case m.isNamespaceTagged:
 		m.rootScope.RecordTimerInternal(def.MetricName.String()+totalMetricSuffix, d)
 	}
@@ -119,8 +119,8 @@ func (m *tallyScope) RecordDistribution(id int, d int) {
 	m.RecordDistributionInternal(def.MetricName.String(), def.unit, d)
 
 	switch {
-	case !def.metricRollupName.Empty():
-		m.rootScope.RecordDistributionInternal(def.metricRollupName.String(), def.unit, d)
+	case !def.MetricRollupName.Empty():
+		m.rootScope.RecordDistributionInternal(def.MetricRollupName.String(), def.unit, d)
 	case m.isNamespaceTagged:
 		m.rootScope.RecordDistributionInternal(def.MetricName.String()+totalMetricSuffix, def.unit, d)
 	}
