@@ -219,7 +219,13 @@ var (
 func (c *Config) InitMetricReporters(logger log.Logger, customReporter interface{}) (Reporter, Reporter, error) {
 	// init from config only
 	if customReporter == nil {
-		return c.HackOfTheCentury(logger, customReporter)
+		if c.Prometheus != nil && len(c.Prometheus.Framework) > 0 {
+			return c.initReportersFromPrometheusConfig(logger, customReporter)
+		}
+
+		scope := c.NewScope(logger)
+		reporter := newTallyReporter(scope, &c.ClientConfig)
+		return reporter, reporter, nil
 	}
 
 	// handle custom reporter from ServerOptions
@@ -234,16 +240,6 @@ func (c *Config) InitMetricReporters(logger log.Logger, customReporter interface
 		return nil, nil, fmt.Errorf(
 			"specified customReporter does not implement tally.BaseStatsReporter or metrics.Reporter")
 	}
-}
-
-func (c *Config) HackOfTheCentury(logger log.Logger, customReporter interface{}) (Reporter, Reporter, error) {
-	if c.Prometheus != nil && len(c.Prometheus.Framework) > 0 {
-		return c.initReportersFromPrometheusConfig(logger, customReporter)
-	}
-
-	scope := c.NewScope(logger)
-	reporter := newTallyReporter(scope, &c.ClientConfig)
-	return reporter, reporter, nil
 }
 
 func (c *Config) initReportersFromPrometheusConfig(logger log.Logger, customReporter interface{}) (Reporter, Reporter, error) {
