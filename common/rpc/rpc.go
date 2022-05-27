@@ -275,7 +275,7 @@ func (d *RPCFactory) CreateFrontendGRPCConnection(rpcAddress string) *grpc.Clien
 			return nil
 		}
 	}
-	d.logger.Info(fmt.Sprintf("Going to dial: %s with config: %v", rpcAddress, tlsClientConfig))
+	d.logger.Info(fmt.Sprintf("[CUSTOM] Going to dial: %s with config: %v", rpcAddress, tlsClientConfig))
 	return d.dial(rpcAddress, tlsClientConfig)
 }
 
