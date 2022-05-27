@@ -164,8 +164,10 @@ func (s *localStoreTlsProvider) GetFrontendClientConfig() (*tls.Config, error) {
 }
 
 func (s *localStoreTlsProvider) GetRemoteClusterClientConfig(hostname string) (*tls.Config, error) {
+	s.logger.Info(fmt.Sprintf("[CUSTOM] Get remote cluster client config for hostname: %s. Remote clusters: %v", hostname, s.settings.RemoteClusters))
 	groupTLS, ok := s.settings.RemoteClusters[hostname]
 	if !ok {
+		s.logger.Info(fmt.Sprintf("[CUSTOM] No groupTLS for hostname: %s. Remote clusters: %v", hostname, s.settings.RemoteClusters))
 		return nil, nil
 	}
 
