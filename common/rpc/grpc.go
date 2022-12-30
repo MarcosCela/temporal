@@ -62,7 +62,7 @@ const (
 // The hostName syntax is defined in
 // https://github.com/grpc/grpc/blob/master/doc/naming.md.
 // e.g. to use dns resolver, a "dns:///" prefix should be applied to the target.
-func Dial(hostName string, tlsConfig *tls.Config, logger log.Logger, interceptors ...grpc.UnaryClientInterceptor) (*grpc.ClientConn, error) {
+func Dial(hostName string, tlsConfig *tls.Config, logger log.Logger, dialOpts []grpc.DialOption, interceptors ...grpc.UnaryClientInterceptor) (*grpc.ClientConn, error) {
 	var grpcSecureOpt grpc.DialOption
 	if tlsConfig == nil {
 		grpcSecureOpt = grpc.WithTransportCredentials(insecure.NewCredentials())
@@ -80,7 +80,6 @@ func Dial(hostName string, tlsConfig *tls.Config, logger log.Logger, interceptor
 		MinConnectTimeout: minConnectTimeout,
 	}
 	cp.Backoff.MaxDelay = MaxBackoffDelay
-
 	dialOptions := []grpc.DialOption{
 		grpcSecureOpt,
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxInternodeRecvPayloadSize)),
@@ -96,7 +95,7 @@ func Dial(hostName string, tlsConfig *tls.Config, logger log.Logger, interceptor
 		grpc.WithDisableServiceConfig(),
 		grpc.WithConnectParams(cp),
 	}
-
+	dialOptions = append(dialOptions, dialOpts...)
 	return grpc.Dial(
 		hostName,
 		dialOptions...,

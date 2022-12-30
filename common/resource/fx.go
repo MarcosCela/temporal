@@ -429,15 +429,14 @@ func RPCFactoryProvider(
 	tlsConfigProvider encryption.TLSConfigProvider,
 	dc *dynamicconfig.Collection,
 	resolver membership.GRPCResolver,
-	interceptors []grpc.UnaryClientInterceptor,
 	traceInterceptor telemetry.ClientTraceInterceptor,
+	dialOpts []grpc.DialOption,
 ) common.RPCFactory {
 	svcCfg := cfg.Services[string(svcName)]
 	hostPort := cfg.PublicClient.HostPort
 	if hostPort == "" {
 		hostPort = resolver.MakeURL(common.FrontendServiceName)
 	}
-	allInterceptors := append(interceptors, grpc.UnaryClientInterceptor(traceInterceptor))
 	return rpc.NewFactory(
 		&svcCfg.RPC,
 		string(svcName),
@@ -445,6 +444,7 @@ func RPCFactoryProvider(
 		tlsConfigProvider,
 		dc,
 		hostPort,
-		allInterceptors,
+		[]grpc.UnaryClientInterceptor{grpc.UnaryClientInterceptor(traceInterceptor)},
+		dialOpts,
 	)
 }

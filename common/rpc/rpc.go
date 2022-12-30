@@ -55,6 +55,7 @@ type RPCFactory struct {
 	grpcListener       net.Listener
 	tlsFactory         encryption.TLSConfigProvider
 	clientInterceptors []grpc.UnaryClientInterceptor
+	dialOpts           []grpc.DialOption
 }
 
 // NewFactory builds a new RPCFactory
@@ -67,6 +68,7 @@ func NewFactory(
 	dc *dynamicconfig.Collection,
 	frontendURL string,
 	clientInterceptors []grpc.UnaryClientInterceptor,
+	dialOpts []grpc.DialOption,
 ) *RPCFactory {
 	return &RPCFactory{
 		config:             cfg,
@@ -76,6 +78,7 @@ func NewFactory(
 		frontendURL:        frontendURL,
 		tlsFactory:         tlsProvider,
 		clientInterceptors: clientInterceptors,
+		dialOpts:           dialOpts,
 	}
 }
 
@@ -239,7 +242,7 @@ func (d *RPCFactory) CreateInternodeGRPCConnection(hostName string) *grpc.Client
 }
 
 func (d *RPCFactory) dial(hostName string, tlsClientConfig *tls.Config) *grpc.ClientConn {
-	connection, err := Dial(hostName, tlsClientConfig, d.logger, d.clientInterceptors...)
+	connection, err := Dial(hostName, tlsClientConfig, d.logger, d.dialOpts, d.clientInterceptors...)
 	if err != nil {
 		d.logger.Fatal("Failed to create gRPC connection", tag.Error(err))
 		return nil
